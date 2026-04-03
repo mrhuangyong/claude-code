@@ -10,7 +10,7 @@ import {
 import type {
   ToolPermissionContext,
   ToolPermissionRulesBySource,
-} from '../../Tool.js'
+} from '../../core/tools/Tool.js'
 import { getCwd } from '../cwd.js'
 import { isEnvTruthy } from '../envUtils.js'
 import type { SettingSource } from '../settings/constants.js'

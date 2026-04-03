@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- 背景 -->
+  <rect width="256" height="256" rx="32" fill="#1e1e3f"/>
+  <!-- 终端符号 -->
+  <rect x="64" y="80" width="128" height="96" rx="8" fill="#2d2d5a" stroke="#6366f1" stroke-width="2"/>
+  <!-- 终端窗口控制按钮 -->
+  <circle cx="76" cy="92" r="4" fill="#ef4444"/>
+  <circle cx="88" cy="92" r="4" fill="#f59e0b"/>
+  <circle cx="100" cy="92" r="4" fill="#10b981"/>
+  <!-- 代码符号 -->
+  <path d="M80 120 L100 140 L120 120 L140 140 L160 120" stroke="#6366f1" stroke-width="4" fill="none"/>
+  <!-- AI 符号 -->
+  <circle cx="192" cy="64" r="24" fill="#8b5cf6"/>
+  <path d="M184 56 L192 48 L200 56" stroke="white" stroke-width="2" fill="none"/>
+  <path d="M192 48 V32" stroke="white" stroke-width="2" fill="none"/>
+</svg>

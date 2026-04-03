@@ -1,4 +1,13 @@
-import { feature } from 'bun:bundle'
+// Use mock feature function in test environment
+let feature: (name: string) => boolean;
+try {
+  // Try to import from bun:bundle
+  const bundleModule = require('bun:bundle');
+  feature = bundleModule.feature;
+} catch (e) {
+  // Fallback to mock implementation for test environment
+  feature = () => false;
+}
 import type { BetaUsage as Usage } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import type {
   ContentBlock,
@@ -36,7 +45,7 @@ import {
   getPdfTooLargeErrorMessage,
   getRequestTooLargeErrorMessage,
 } from '../services/api/errors.js'
-import type { AnyObject, Progress } from '../Tool.js'
+import type { AnyObject, Progress } from '../core/tools/Tool.js'
 import { isConnectorTextBlock } from '../types/connectorText.js'
 import type {
   AssistantMessage,

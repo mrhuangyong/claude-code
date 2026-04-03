@@ -11,7 +11,7 @@ import {
   type Tool,
   type ToolDef,
   type Tools,
-} from '../../Tool.js'
+} from '../../core/tools/Tool.js'
 import { logForDebugging } from '../../utils/debug.js'
 import { lazySchema } from '../../utils/lazySchema.js'
 import { escapeRegExp } from '../../utils/stringUtils.js'

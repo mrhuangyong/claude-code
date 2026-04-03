@@ -38,7 +38,9 @@
   ],
   "scripts": {
     "build": "bun run build.ts",
+    "build:vite": "vite build",
     "dev": "bun run scripts/dev.ts",
+    "dev:vite": "vite",
     "dev:inspect": "bun run scripts/dev-debug.ts",
     "prepublishOnly": "bun run build",
     "lint": "biome lint src/",
@@ -49,10 +51,17 @@
     "check:unused": "knip-bun",
     "health": "bun run scripts/health-check.ts",
     "postinstall": "node dist/download-ripgrep.js || bun run scripts/download-ripgrep.ts || true",
-    "docs:dev": "npx mintlify dev"
+    "docs:dev": "npx mintlify dev",
+    "electron:dev": "NODE_ENV=development bun run electron/src/main.ts",
+    "electron:build": "bun run build && bun run build-desktop && electron-builder --config electron/electron-builder.json",
+    "build-desktop": "bun run build-desktop.ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "react-dom": "^19.2.4"
+  },
   "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3",
     "@alcalzone/ansi-tokenize": "^0.3.0",
     "@ant/claude-for-chrome-mcp": "workspace:*",
     "@ant/computer-use-input": "workspace:*",
@@ -103,6 +112,7 @@
     "@types/react-reconciler": "^0.33.0",
     "@types/sharp": "^0.32.0",
     "@types/turndown": "^5.0.6",
+    "@vitejs/plugin-react": "^6.0.1",
     "ajv": "^8.18.0",
     "asciichart": "^1.5.25",
     "audio-capture-napi": "workspace:*",
@@ -159,6 +169,7 @@
     "undici": "^7.24.6",
     "url-handler-napi": "workspace:*",
     "usehooks-ts": "^3.1.1",
+    "vite": "^8.0.3",
     "vscode-jsonrpc": "^8.2.1",
     "vscode-languageserver-protocol": "^3.17.5",
     "vscode-languageserver-types": "^3.17.5",
