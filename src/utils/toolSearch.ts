@@ -12,12 +12,12 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '../services/analytics/index.js'
-import type { Tool } from '../Tool.js'
+import type { Tool } from '../core/tools/Tool.js'
 import {
   type ToolPermissionContext,
   type Tools,
   toolMatchesName,
-} from '../Tool.js'
+} from '../core/tools/Tool.js'
 import type { AgentDefinition } from '../tools/AgentTool/loadAgentsDir.js'
 import {
   formatDeferredToolLine,

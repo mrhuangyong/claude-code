@@ -20,7 +20,7 @@ import { bindSessionContext, type ComputerUseSessionContext, type CuCallToolResu
 import * as React from 'react';
 import { getSessionId } from '../../bootstrap/state.js';
 import { ComputerUseApproval } from '../../components/permissions/ComputerUseApproval/ComputerUseApproval.js';
-import type { Tool, ToolUseContext } from '../../Tool.js';
+import type { Tool, ToolUseContext } from '../../core/tools/Tool.js';
 import { logForDebugging } from '../debug.js';
 import { checkComputerUseLock, tryAcquireComputerUseLock } from './computerUseLock.js';
 import { registerEscHotkey } from './escHotkey.js';

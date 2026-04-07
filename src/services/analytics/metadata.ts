@@ -39,7 +39,16 @@ import {
   getTeamName,
   isTeammate,
 } from '../../utils/teammate.js'
-import { feature } from 'bun:bundle'
+// Use mock feature function in test environment
+let feature: (name: string) => boolean;
+try {
+  // Try to import from bun:bundle
+  const bundleModule = require('bun:bundle');
+  feature = bundleModule.feature;
+} catch (e) {
+  // Fallback to mock implementation for test environment
+  feature = () => false;
+}
 
 /**
  * Marker type for verifying analytics metadata doesn't contain sensitive data

@@ -28,7 +28,7 @@ import {
   type Tools,
   type ToolUseContext,
   toolMatchesName,
-} from '../Tool.js'
+} from '../core/tools/Tool.js'
 import type {
   AgentDefinition,
   AgentDefinitionsResult,

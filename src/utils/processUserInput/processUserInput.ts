@@ -16,7 +16,7 @@ import {
 } from '../../commands.js'
 import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
 import type { IDESelection } from '../../hooks/useIdeSelection.js'
-import type { SetToolJSXFn, ToolUseContext } from '../../Tool.js'
+import type { SetToolJSXFn, ToolUseContext } from '../../core/tools/Tool.js'
 import type {
   AssistantMessage,
   AttachmentMessage,

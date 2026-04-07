@@ -1,0 +1,51 @@
+/* InputArea.css */
+.input-area {
+  display: flex;
+  padding: 1rem;
+  background-color: white;
+  border-top: 1px solid #e2e8f0;
+  align-items: flex-end;
+}
+
+.input-textarea {
+  flex: 1;
+  min-height: 4rem;
+  max-height: 12rem;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  resize: none;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-right: 1rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.input-textarea:focus {
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.send-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #3182ce;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  height: fit-content;
+}
+
+.send-button:hover:not(:disabled) {
+  background-color: #2c5282;
+}
+
+.send-button:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+}
