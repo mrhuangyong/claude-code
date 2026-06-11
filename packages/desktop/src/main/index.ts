@@ -5,6 +5,9 @@ import { appRouter } from './ipc/router'
 import type { AppContext } from './ipc/context'
 import { CliProcessPool } from './cli-pool'
 import { getConfigStore } from './store'
+import { createTray } from './tray'
+import { createAppMenu } from './menu'
+import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './shortcuts'
 
 function createSessionStore(): AppContext['sessionStore'] {
   const sessions = new Map<
@@ -54,6 +57,10 @@ app.whenReady().then(() => {
     windows: [mainWindow],
   })
 
+  createTray(mainWindow)
+  createAppMenu(mainWindow)
+  registerGlobalShortcuts(mainWindow)
+
   app.on('activate', () => {
     if (process.platform === 'darwin') {
       createMainWindow()
@@ -65,4 +72,8 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+app.on('will-quit', () => {
+  unregisterGlobalShortcuts()
 })
