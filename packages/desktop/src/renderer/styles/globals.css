@@ -40,6 +40,14 @@ body {
 }
 
 body.dark {
+  --color-surface-0: var(--color-dark-surface-0);
+  --color-surface-1: var(--color-dark-surface-1);
+  --color-surface-2: var(--color-dark-surface-2);
+  --color-surface-3: var(--color-dark-surface-3);
+  --color-text-primary: var(--color-dark-text-primary);
+  --color-text-secondary: var(--color-dark-text-secondary);
+  --color-text-tertiary: var(--color-dark-text-tertiary);
+  --color-border: var(--color-dark-border);
   background: var(--color-dark-surface-0);
   color: var(--color-dark-text-primary);
 }

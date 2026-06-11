@@ -8,6 +8,7 @@ import { getConfigStore } from './store'
 import { createTray } from './tray'
 import { createAppMenu } from './menu'
 import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './shortcuts'
+import { setupAutoUpdater } from './updater'
 
 function createSessionStore(): AppContext['sessionStore'] {
   const sessions = new Map<
@@ -60,6 +61,7 @@ app.whenReady().then(() => {
   createTray(mainWindow)
   createAppMenu(mainWindow)
   registerGlobalShortcuts(mainWindow)
+  setupAutoUpdater(mainWindow)
 
   app.on('activate', () => {
     if (process.platform === 'darwin') {
