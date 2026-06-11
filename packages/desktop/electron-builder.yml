@@ -1,0 +1,41 @@
+appId: com.claude-code-best.desktop
+productName: Claude Code Best
+copyright: Copyright © 2025
+
+directories:
+  output: release
+  buildResources: resources
+
+files:
+  - "!**/*.map"
+
+extraResources:
+  - from: "../../dist"
+    to: "cli"
+    filter:
+      - "**/*"
+
+asarUnpack:
+  - "resources/**"
+
+mac:
+  category: public.app-category.productivity
+  target:
+    - dmg
+    - zip
+  hardenedRuntime: true
+  entitlements: resources/entitlements.mac.plist
+  entitlementsInherit: resources/entitlements.mac.plist
+
+win:
+  target:
+    - nsis
+    - portable
+  artifactName: "${name}-${version}-setup.${ext}"
+
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Office
+  artifactName: "${name}-${version}.${ext}"
