@@ -11,7 +11,7 @@ export function createMainWindow(): BrowserWindow {
     show: false,
     autoHideMenuBar: true,
     titleBarStyle: 'hiddenInset',
-    trafficLightPosition: { x: 16, y: 18 },
+    trafficLightPosition: { x: 16, y: 13 },
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
