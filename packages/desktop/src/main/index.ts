@@ -1,8 +1,6 @@
 import { app } from 'electron'
 import { createMainWindow } from './window'
-import { createIPCHandler } from 'electron-trpc/main'
-import { appRouter } from './ipc/router'
-import type { AppContext } from './ipc/context'
+import { registerIpcHandlers, type IpcContext } from './ipc/handlers'
 import { CliProcessPool } from './cli-pool'
 import { getConfigStore } from './store'
 import { createTray } from './tray'
@@ -10,53 +8,49 @@ import { createAppMenu } from './menu'
 import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './shortcuts'
 import { setupAutoUpdater } from './updater'
 
-function createSessionStore(): AppContext['sessionStore'] {
-  const sessions = new Map<
-    string,
-    {
-      id: string
-      createdAt: number
-      history: Array<{ role: string; content: string }>
-    }
-  >()
-
-  return {
-    listSessions() {
-      return Array.from(sessions.values())
-    },
-    createSession() {
-      const id = crypto.randomUUID()
-      sessions.set(id, { id, createdAt: Date.now(), history: [] })
-      return id
-    },
-    deleteSession(id: string) {
-      sessions.delete(id)
-    },
-    getHistory(id: string) {
-      const session = sessions.get(id)
-      return session?.history ?? null
-    },
-  }
-}
-
 app.whenReady().then(() => {
   const mainWindow = createMainWindow()
 
   const cliPool = new CliProcessPool()
   const configStore = getConfigStore()
-  const sessionStore = createSessionStore()
 
-  const context: AppContext = {
+  const sessionStore = {
+    _sessions: new Map<
+      string,
+      { id: string; title: string; createdAt: string; updatedAt: string }
+    >(),
+    listSessions() {
+      return Array.from(sessionStore._sessions.values())
+    },
+    createSession(title?: string) {
+      const id = crypto.randomUUID()
+      const session = {
+        id,
+        title: title ?? '新对话',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+      sessionStore._sessions.set(id, session)
+      return session
+    },
+    deleteSession(id: string) {
+      sessionStore._sessions.delete(id)
+    },
+    getHistory(id: string) {
+      return null
+    },
+  }
+
+  const ipcContext: IpcContext = {
     cliPool,
-    configStore,
+    getConfig: () => configStore.store as Record<string, unknown>,
+    setConfig: (key, value) => {
+      configStore.set(key, value)
+    },
     sessionStore,
   }
 
-  createIPCHandler({
-    router: appRouter,
-    createContext: async () => context,
-    windows: [mainWindow],
-  })
+  registerIpcHandlers(ipcContext)
 
   createTray(mainWindow)
   createAppMenu(mainWindow)

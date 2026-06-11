@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { cliBridge } from '@renderer/lib/cli-bridge'
-import type { CliStreamEvent } from '../../main/cli-protocol'
+import type { CliStreamEvent } from '@renderer/lib/cli-bridge'
 
 export interface ToolCall {
   tool: string

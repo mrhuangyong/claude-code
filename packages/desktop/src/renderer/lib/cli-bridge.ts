@@ -1,45 +1,27 @@
-import { createTRPCClient, httpBatchLink } from '@trpc/client'
-import { ipcLink } from 'electron-trpc/renderer'
-import type { AppRouter } from '../../main/ipc/router'
-import type { CliStreamEvent } from '../../main/cli-protocol'
+const IPC_CHANNEL = 'desktop-api'
 
-type AppRouterType = AppRouter
+interface WindowApi {
+  invoke: (channel: string, args?: unknown) => Promise<unknown>
+  onStreamEvent: (
+    callback: (data: { sessionId: string; event: unknown }) => void,
+  ) => () => void
+  channel: string
+}
 
-/**
- * Renderer-side API client that communicates with the main process.
- *
- * Uses electron-trpc's ipcLink to tunnel tRPC calls over Electron IPC.
- * Falls back to a no-op client when running outside Electron (e.g. storybook).
- */
-class CliBridge {
-  private client: ReturnType<typeof createTRPCClient<AppRouterType>> | null =
-    null
-
-  private getClient(): ReturnType<typeof createTRPCClient<AppRouterType>> {
-    if (this.client) return this.client
-
-    // Check if we are inside Electron with electronTRPC exposed by the preload script
-    const hasElectronTRPC =
-      typeof globalThis !== 'undefined' && 'electronTRPC' in globalThis
-
-    if (hasElectronTRPC) {
-      this.client = createTRPCClient<AppRouterType>({
-        links: [ipcLink()],
-      })
-    } else {
-      // Fallback: create a dummy client that throws on any call.
-      // This keeps the UI functional for development outside Electron.
-      this.client = createTRPCClient<AppRouterType>({
-        links: [
-          httpBatchLink({
-            url: 'http://localhost:0',
-          }),
-        ],
-      })
-    }
-
-    return this.client
+declare global {
+  interface Window {
+    api: WindowApi
   }
+}
+
+function getApi(): WindowApi {
+  return window.api
+}
+
+class CliBridge {
+  private streamListener:
+    | ((data: { sessionId: string; event: unknown }) => void)
+    | null = null
 
   async sendMessage(
     sessionId: string,
@@ -51,63 +33,104 @@ class CliBridge {
       mediaType?: string
     }>,
   ): Promise<{ success: boolean; sessionId: string }> {
-    return this.getClient().chat.sendMessage.mutate({
-      id: sessionId,
+    const api = getApi()
+
+    // Set up stream listener
+    if (!this.streamListener) {
+      this.streamListener = () => {}
+      api.onStreamEvent(data => {
+        if (this.streamListener) {
+          this.streamListener(data)
+        }
+      })
+    }
+
+    return api.invoke(`${IPC_CHANNEL}:chat.sendMessage`, {
+      sessionId,
       content,
       attachments,
-    })
+    }) as Promise<{ success: boolean; sessionId: string }>
+  }
+
+  onStreamEvent(
+    callback: (data: { sessionId: string; event: unknown }) => void,
+  ): void {
+    this.streamListener = callback
   }
 
   async abortStream(sessionId: string): Promise<{ success: boolean }> {
-    return this.getClient().chat.abort.mutate({ id: sessionId })
+    return getApi().invoke(`${IPC_CHANNEL}:chat.abort`, {
+      sessionId,
+    }) as Promise<{ success: boolean }>
   }
 
-  async getConfig(): Promise<{
-    provider: string
-    apiKeys: Record<string, string>
-    model: string
-    baseUrl: string
-    theme: string
-    fontSize: number
-    language: string
-    sendOnEnter: boolean
-  }> {
-    return this.getClient().config.get.query()
+  async getConfig(): Promise<Record<string, unknown>> {
+    return getApi().invoke(`${IPC_CHANNEL}:config.get`) as Promise<
+      Record<string, unknown>
+    >
   }
 
   async setConfig(
-    config: Partial<{
-      provider: string
-      apiKeys: Record<string, string>
-      model: string
-      baseUrl: string
-      theme: string
-      fontSize: number
-      language: string
-      sendOnEnter: boolean
-    }>,
+    config: Record<string, unknown>,
   ): Promise<{ success: boolean }> {
-    return this.getClient().config.set.mutate(config)
+    return getApi().invoke(`${IPC_CHANNEL}:config.set`, config) as Promise<{
+      success: boolean
+    }>
   }
 
-  async listSessions(): Promise<Array<{ id: string; createdAt: number }>> {
-    return this.getClient().session.list.query()
+  async listSessions(): Promise<
+    Array<{ id: string; title: string; updatedAt: string }>
+  > {
+    return getApi().invoke(`${IPC_CHANNEL}:session.list`) as Promise<
+      Array<{ id: string; title: string; updatedAt: string }>
+    >
   }
 
-  async createSession(): Promise<{ id: string }> {
-    return this.getClient().session.create.mutate()
+  async createSession(): Promise<{
+    id: string
+    title: string
+    createdAt: string
+    updatedAt: string
+  }> {
+    return getApi().invoke(`${IPC_CHANNEL}:session.create`) as Promise<{
+      id: string
+      title: string
+      createdAt: string
+      updatedAt: string
+    }>
   }
 
   async deleteSession(id: string): Promise<{ success: boolean }> {
-    return this.getClient().session.delete.mutate({ id })
+    return getApi().invoke(`${IPC_CHANNEL}:session.delete`, { id }) as Promise<{
+      success: boolean
+    }>
   }
 
-  async getHistory(
-    id: string,
-  ): Promise<Array<{ role: string; content: string }> | null> {
-    return this.getClient().session.getHistory.query({ id })
+  async getHistory(id: string): Promise<unknown> {
+    return getApi().invoke(`${IPC_CHANNEL}:session.getHistory`, { id })
   }
 }
 
 export const cliBridge = new CliBridge()
-export type { CliStreamEvent }
+
+export interface CliStreamEvent {
+  type: string
+  id?: string
+  delta?: { text?: string }
+  block?: { type: string; text?: string }
+  tool?: string
+  input?: Record<string, unknown>
+  output?: string
+  error?: string
+  message?: {
+    role: string
+    content: Array<{
+      type: string
+      text?: string
+      name?: string
+      input?: Record<string, unknown>
+    }>
+    model?: string
+    usage?: { input_tokens: number; output_tokens: number }
+  }
+}
